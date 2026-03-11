@@ -13,6 +13,7 @@
         .product-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
         #paymentModal { display: none; }
         #paymentModal.active { display: flex; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -68,59 +69,143 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
-    <script src="products.js"></script>
-    <script src="banners.js"></script>
-    <script src="categories.js"></script>
-    <script src="reviews.js"></script>
-    <script src="social.js"></script>
-    <script src="payment.js"></script>
+    <script>
+        const storeConfig = {
+            storeName: "دولر بلس | Dolr Plus",
+            copyright: "جميع الحقوق محفوظة © 2024 دولر بلس",
+            logo: "https://i.ibb.co/68XW9QG/IMG-7454.jpg", // رابط لوجو افتراضي
+            support: {
+                whatsapp: "966595234388",
+                instagram: "dolr_plus"
+            },
+            telegram: {
+                token: "8254444681:AAHYJz1CtqVTT1ovCVUOPCckj3AySLAs8UI",
+                chatId: "591768998"
+            }
+        };
+
+        function getStoreConfig() {
+            const saved = localStorage.getItem('admin_store_config');
+            return saved ? JSON.parse(saved) : storeConfig;
+        }
+    </script>
 
     <script>
-        // دالة الربط النهائي (التي تدمج كل الملفات مع الواجهة)
-        function initializeStore() {
-            const config = typeof getStoreConfig === 'function' ? getStoreConfig() : storeConfig;
+        const products = [
+            { id: 1, name: "شريحة بيانات STC", price: "80.00", img: "https://i.ibb.co/68XW9QG/IMG-7454.jpg" },
+            { id: 2, name: "اشتراك سناب رسمي (3 أشهر)", price: "25.00", img: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Snapchat_logo.svg/1200px-Snapchat_logo.svg.png" },
+            { id: 3, name: "اشتراك سناب رسمي (6 أشهر)", price: "45.00", img: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Snapchat_logo.svg/1200px-Snapchat_logo.svg.png" },
+            { id: 4, name: "اشتراك سناب رسمي (12 شهر)", price: "90.00", img: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Snapchat_logo.svg/1200px-Snapchat_logo.svg.png" }
+        ];
+    </script>
 
-            // 1. تطبيق الهوية
+    <script>
+        const banners = [{
+            title: "DOLR PLUS",
+            subtitle: "موثوق في مركز الأعمال السعودي",
+            image: "https://i.ibb.co/68XW9QG/IMG-7454.jpg"
+        }];
+    </script>
+
+    <script>
+        const categories = [
+            { name: "سناب شات", img: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Snapchat_logo.svg/1200px-Snapchat_logo.svg.png" },
+            { name: "ذكاء اصطناعي", img: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" },
+            { name: "بيانات وإتصال", img: "https://i.ibb.co/68XW9QG/IMG-7454.jpg" }
+        ];
+    </script>
+
+    <script>
+        const reviews = [
+            { stars: "⭐⭐⭐⭐⭐", text: "خدمة سريعة جداً!", initials: "أ ش", name: "أحمد الشمري", color: "bg-blue-900/50 text-blue-400" },
+            { stars: "⭐⭐⭐⭐⭐", text: "أفضل متجر شحن جربته.", initials: "س ع", name: "سارة علي", color: "bg-pink-900/50 text-pink-400" }
+        ];
+    </script>
+
+    <script>
+        function renderSocial() {
+            const config = getStoreConfig();
+            const container = document.getElementById('social-container');
+            if (container) {
+                container.innerHTML = `
+                    <a href="https://wa.me/${config.support.whatsapp}" target="_blank" class="bg-green-500/10 text-green-500 px-4 py-2 rounded-xl border border-green-500/20">واتساب</a>
+                    <a href="https://instagram.com/${config.support.instagram}" target="_blank" class="bg-pink-500/10 text-pink-500 px-4 py-2 rounded-xl border border-pink-500/20">إنستقرام</a>
+                `;
+            }
+        }
+    </script>
+
+    <script>
+        async function initiateOrder() {
+            const config = getStoreConfig();
+            const phone = document.getElementById('phone').value;
+            const prodName = document.getElementById('modalProdName').innerText;
+            const price = document.getElementById('modalPriceDisplay').innerText;
+
+            const msg = `🔔 طلب جديد\nالمنتج: ${prodName}\nالسعر: ${price}\nالجوال: ${phone}`;
+            
+            try {
+                await fetch(`https://api.telegram.org/bot${config.telegram.token}/sendMessage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({chat_id: config.telegram.chatId, text: msg})
+                });
+                alert("تم إرسال طلبك بنجاح!");
+                closeModal();
+            } catch (e) {
+                alert("حدث خطأ في الإرسال");
+            }
+        }
+
+        function initializeStore() {
+            const config = getStoreConfig();
+
             document.getElementById('site-title').innerText = config.storeName;
             document.getElementById('store-name-nav').innerText = config.storeName;
             document.getElementById('footer-copyright').innerText = config.copyright;
             document.querySelectorAll('.store-logo').forEach(img => img.src = config.logo);
 
-            // 2. عرض البانر (من banners.js)
-            if (typeof banners !== 'undefined' && banners.length > 0) {
-                const b = banners[0];
-                document.getElementById('main-banner-img').src = b.image;
-                document.getElementById('banner-title').innerText = b.title;
-                document.getElementById('banner-sub').innerText = b.subtitle;
+            // البانر
+            if (banners.length > 0) {
+                document.getElementById('main-banner-img').src = banners[0].image;
+                document.getElementById('banner-title').innerText = banners[0].title;
+                document.getElementById('banner-sub').innerText = banners[0].subtitle;
             }
 
-            // 3. عرض التصنيفات (من categories.js)
-            const catList = document.getElementById('categories-list');
-            if (typeof categories !== 'undefined') {
-                catList.innerHTML = categories.map(c => `
-                    <div class="flex-none text-center">
-                        <div class="w-16 h-16 bg-gray-800 rounded-2xl p-3 mb-2 border border-gray-700">
-                            <img src="${c.img}" class="w-full h-full object-contain">
-                        </div>
-                        <span class="text-[10px] font-bold">${c.name}</span>
+            // التصنيفات
+            document.getElementById('categories-list').innerHTML = categories.map(c => `
+                <div class="flex-none text-center">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl p-3 mb-2 border border-gray-700">
+                        <img src="${c.img}" class="w-full h-full object-contain">
                     </div>
-                `).join('');
-            }
+                    <span class="text-[10px] font-bold">${c.name}</span>
+                </div>
+            `).join('');
 
-            // 4. عرض المنتجات (من products.js)
-            const prodList = document.getElementById('products-list');
-            if (typeof products !== 'undefined') {
-                prodList.innerHTML = products.map(p => `
-                    <div class="product-card rounded-3xl overflow-hidden cursor-pointer" onclick="openModal('${p.name}', '${p.price}', '${p.img}')">
-                        <img src="${p.img}" class="w-full aspect-square object-cover">
-                        <div class="p-4">
-                            <h5 class="text-xs font-bold text-gray-300 mb-1">${p.name}</h5>
-                            <p class="text-blue-500 font-black">${p.price} SAR</p>
-                        </div>
+            // المنتجات
+            document.getElementById('products-list').innerHTML = products.map(p => `
+                <div class="product-card rounded-3xl overflow-hidden cursor-pointer" onclick="openModal('${p.name}', '${p.price}', '${p.img}')">
+                    <img src="${p.img}" class="w-full aspect-square object-cover">
+                    <div class="p-4">
+                        <h5 class="text-xs font-bold text-gray-300 mb-1">${p.name}</h5>
+                        <p class="text-blue-500 font-black">${p.price} SAR</p>
                     </div>
-                `).join('');
-            }
+                </div>
+            `).join('');
+
+            // الآراء
+            document.getElementById('reviews-container').innerHTML = reviews.map(rev => `
+                <div class="min-w-[280px] bg-gray-800 p-6 rounded-3xl border border-gray-700 snap-center">
+                    <div class="text-yellow-400 mb-2">${rev.stars}</div>
+                    <p class="text-sm text-gray-300 mb-4 italic">"${rev.text}"</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 ${rev.color} rounded-full flex items-center justify-center font-bold">${rev.initials}</div>
+                        <h4 class="text-xs font-bold">${rev.name}</h4>
+                    </div>
+                </div>
+            `).join('');
+
+            renderSocial();
         }
 
         function openModal(name, price, img) {
@@ -132,19 +217,6 @@
 
         function closeModal() {
             document.getElementById('paymentModal').classList.remove('active');
-        }
-
-        // دالة إتمام الطلب المرتبطة بـ payment.js
-        async function initiateOrder() {
-            const phone = document.getElementById('phone').value;
-            if (phone.length < 9) return alert("الرجاء إدخال رقم صحيح");
-            
-            // هنا يتم استدعاء المنطق الموجود في payment.js لإرسال التليجرام
-            if (typeof processPayment === 'function') {
-                processPayment(); 
-            } else {
-                alert("تم استلام طلبك! (تأكد من ربط ملف payment.js)");
-            }
         }
 
         window.onload = initializeStore;
