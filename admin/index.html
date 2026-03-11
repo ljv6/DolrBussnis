@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم | دولر بلس</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config.js"></script>
+    <style>
+        body { background: #0b0f1a; color: white; font-family: 'Tajawal', sans-serif; }
+        .input-group { background: #161c2d; padding: 20px; border-radius: 15px; border: 1px solid #2d3748; }
+        input { background: #0b0f1a; border: 1px solid #2d3748; padding: 12px; border-radius: 10px; width: 100%; color: white; margin-top: 5px; outline: none; }
+        input:focus { border-color: #3b82f6; }
+    </style>
+</head>
+<body class="p-6 max-w-4xl mx-auto">
+
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-black text-blue-500">الإعدادات الشاملة</h1>
+        <p class="text-gray-400">تحكم في هوية المتجر، الشعارات، وبوت الإشعارات</p>
+    </div>
+
+    <div class="space-y-6">
+        <div class="input-group">
+            <h2 class="font-bold text-blue-400 mb-4">🏢 هوية المتجر</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label>اسم المتجر</label><input id="s-name" type="text"></div>
+                <div><label>رابط اللوقو</label><input id="s-logo" type="text"></div>
+                <div class="md:col-span-2"><label>حقوق الفوتر</label><input id="s-copy" type="text"></div>
+            </div>
+        </div>
+
+        <div class="input-group border-blue-900/30">
+            <h2 class="font-bold text-blue-400 mb-4">🤖 إعدادات بوت التليجرام</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label>توكن البوت (Token)</label><input id="s-token" type="password"></div>
+                <div><label>معرف القناة (Chat ID)</label><input id="s-chat" type="text"></div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h2 class="font-bold text-blue-400 mb-4">📞 بيانات التواصل</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label>واتساب</label><input id="s-wa" type="text"></div>
+                <div><label>إنستقرام</label><input id="s-ins" type="text"></div>
+            </div>
+        </div>
+
+        <button onclick="saveAll()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-black text-xl shadow-xl transition-all active:scale-95">حفظ وتحديث المتجر الآن ✨</button>
+    </div>
+
+    <script>
+        // تحميل البيانات الحالية من config.js أو localStorage
+        const cfg = typeof getStoreConfig === 'function' ? getStoreConfig() : storeConfig;
+        
+        document.getElementById('s-name').value = cfg.storeName;
+        document.getElementById('s-logo').value = cfg.logo;
+        document.getElementById('s-copy').value = cfg.copyright;
+        document.getElementById('s-token').value = cfg.telegram.token;
+        document.getElementById('s-chat').value = cfg.telegram.chatId;
+        document.getElementById('s-wa').value = cfg.support.whatsapp;
+        document.getElementById('s-ins').value = cfg.support.instagram;
+
+        function saveAll() {
+            const updated = {
+                storeName: document.getElementById('s-name').value,
+                logo: document.getElementById('s-logo').value,
+                copyright: document.getElementById('s-copy').value,
+                telegram: {
+                    token: document.getElementById('s-token').value,
+                    chatId: document.getElementById('s-chat').value
+                },
+                support: {
+                    whatsapp: document.getElementById('s-wa').value,
+                    instagram: document.getElementById('s-ins').value
+                }
+            };
+            localStorage.setItem('admin_store_config', JSON.stringify(updated));
+            alert("تم حفظ جميع الإعدادات! سيظهر التغيير في المتجر فوراً.");
+            location.reload();
+        }
+    </script>
+</body>
+</html>
